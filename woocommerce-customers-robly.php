@@ -184,3 +184,72 @@ function wcc_robly_options_page() { ?>
     <?php
 }
 
+/**
+ * Add tab to Woo products
+ */
+add_filter( 'woocommerce_product_data_tabs', 'wcc_robly_product_tab' );
+function wcc_robly_product_tab( $product_data_tabs ) {
+    // Adds the new tab
+    $product_data_tabs['wcc_robly_tab'] = array(
+        'label' 	=> __( 'Robly', 'wcc_robly' ),
+        'target' 	=> 'wcc_robly_product_tab_content'
+    );
+    return $product_data_tabs;
+}
+add_action( 'woocommerce_product_data_panels', 'wcc_robly_add_product_data_fields' );
+function wcc_robly_add_product_data_fields() {
+    global $woocommerce, $post;
+    ?>
+    <div id="wcc_robly_product_tab_content" class="panel woocommerce_options_panel">
+    <?php
+    $options = get_option( 'wcc_robly_settings' );
+    if ( $options['wcc_robly_api_id'] && $options['wcc_robly_api_key'] ) {
+        $robly_API_id = $options['wcc_robly_api_id'];
+        $robly_API_key = $options['wcc_robly_api_key'];
+
+        // get all sublists from Robly API
+        $sublists_ch = curl_init();
+        curl_setopt( $sublists_ch, CURLOPT_URL, 'https://api.robly.com/api/v1/sub_lists/show?api_id=' . $robly_API_id . '&api_key=' . $robly_API_key . '&include_all=true' );
+        curl_setopt( $sublists_ch, CURLOPT_RETURNTRANSFER, true );
+        $sublists_ch_response = curl_exec( $sublists_ch );
+        curl_close( $sublists_ch );
+
+        // get saved data
+        $current_sublist_selections = maybe_unserialize( get_post_meta( $post->ID, '_wcc_robly_sublists', true ) );
+
+        // decode JSON return into array of checkboxes
+        $all_sublists = json_decode( $sublists_ch_response );
+        if ( $all_sublists ) {
+            // output select ?>
+            <p class="form-field">
+                <label for="wcc_robly_sublists[]">Choose the list(s) to add this customer to:</label>
+                <select multiple name="wcc_robly_sublists[]" size="<?php count( $all_sublists ); ?>">
+                <?php foreach ( $all_sublists as $list ) {
+                    echo '<option value="' . $list->sub_list->id . '"';
+                    if ( in_array( $list->sub_list->id, $current_sublist_selections ) ) {
+                        echo ' selected="selected"';
+                    }
+                    echo '>' . $list->sub_list->name . '</option>';
+                } ?>
+                </select>
+            </p>
+        <?php
+        }
+    } else {
+        echo '<p>Please check your <a href="' . get_site_url() .'/wp-admin/options-general.php?page=woocommerce-customers-robly">Robly API ID and key</a></p>';
+    }
+    ?>
+    </div>
+    <?php
+}
+
+// save checkbox data
+add_action( 'woocommerce_process_product_meta', 'wcc_robly_add_product_data_fields_save' );
+function wcc_robly_add_product_data_fields_save( $post_id ) {
+    $wcc_robly_lists = $_POST['wcc_robly_sublists'];
+    if ( ! empty( $wcc_robly_lists ) && ! is_serialized( $wcc_robly_lists ) ) {
+        update_post_meta( $post_id, '_wcc_robly_sublists', maybe_serialize( $wcc_robly_lists ) );
+    }
+}
+
+
