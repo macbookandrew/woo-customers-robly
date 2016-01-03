@@ -1,4 +1,4 @@
-=== Woocommerce Customers to Robly ===
+=== WooCommerce Customers to Robly ===
 Contributors: macbookandrew
 Donate link: http://cash.me/$AndrewRMinionDesign
 Tags: woocommerce, robly, email
@@ -8,11 +8,11 @@ Stable tag: 1.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Adds Woocommerce customers to one or more Robly lists, optionally based on the product(s) they purchased.
+Adds WooCommerce customers to one or more Robly lists, optionally based on the product(s) they purchased.
 
 == Description ==
 
-Adds Woocommerce customers to one or more Robly lists, optionally based on the product(s) they purchased.
+Adds WooCommerce customers to one or more Robly lists, optionally based on the product(s) they purchased.
 
 
 == Installation ==
