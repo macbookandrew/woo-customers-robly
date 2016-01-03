@@ -140,7 +140,7 @@ function wcc_robly_global_sublists_render() {
                 echo '<option value="' . $list->sub_list->id . '"';
 
                 // mark as selected if chosen
-                if ( in_array( $list->sub_list->id, $selected_lists ) ) {
+                if ( $selected_lists && in_array( $list->sub_list->id, $selected_lists ) ) {
                     echo ' selected="selected"';
                 }
                 echo '>' . $list->sub_list->name . '</option>';
