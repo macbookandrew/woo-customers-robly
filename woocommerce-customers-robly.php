@@ -253,3 +253,91 @@ function wcc_robly_add_product_data_fields_save( $post_id ) {
 }
 
 
+/**
+ * Add customer emails to Robly
+ */
+
+/* hook into Woocommerce payment complete */
+add_action( 'woocommerce_payment_complete', 'submit_woo_customers_to_robly', 10, 1 );
+function submit_woo_customers_to_robly( $order_id ) {
+    global $wpdb;
+
+    // get API keys
+    $options = get_option( 'wcc_robly_settings' );
+    $robly_API_id = $options['wcc_robly_api_id'];
+    $robly_API_key = $options['wcc_robly_api_key'];
+
+    // set notification email address
+    if ( $options['alternate_email'] ) {
+        $notification_email = $options['alternate_email'];
+    } else {
+        $notification_email = get_option( 'admin_email' );
+    }
+
+    // get global sublists
+    $robly_sublists = $options['wcc_robly_global_sublists'];
+
+    // get order info
+    $order = new WC_Order( $order_id );
+
+    // loop through order items to get Robly sublist IDs
+    foreach ( $order->get_items() as $item ) {
+        $item_robly_lists = get_post_meta( $item['product_id'], '_wcc_robly_sublists', true );
+        foreach ( maybe_unserialize( $item_robly_lists ) as $this_sublist ) {
+            $robly_sublists[] = $this_sublist;
+        }
+    }
+
+    // get customer info
+    $email = get_user_meta( $order->customer_user, 'billing_email' );
+    $first_name = get_user_meta( $order->customer_user, 'billing_first_name' );
+    $last_name = get_user_meta( $order->customer_user, 'billing_last_name' );
+    $state = get_user_meta( $order->customer_user, 'billing_state' );
+
+    // set up data for the request
+    $post_url_first_run = 'https://api.robly.com/api/v1/sign_up/generate?api_id=' . $robly_API_id . '&api_key=' . $robly_API_key;
+    $post_url_subsequent_runs = 'https://api.robly.com/api/v1/contacts/update_full_contact?api_id=' . $robly_API_id . '&api_key=' . $robly_API_key;
+    $post_request_data = array(
+        'email'         => $email,
+        'fname'         => $first_name,
+        'lname'         => $last_name,
+        'state'         => $state
+    );
+
+    // send request via cUrl
+    $ch = curl_init();
+
+    curl_setopt( $ch, CURLOPT_URL, $post_url_first_run );
+    curl_setopt( $ch, CURLOPT_POST, 1 );
+    curl_setopt( $ch, CURLOPT_POSTFIELDS, $post_request_data );
+    curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
+
+    $first_curl_response = curl_exec( $ch );
+
+    // get sublist(s) and run cUrl for each since PHP won’t allow duplicate array keys and Robly requires sub_lists[] => each list ID
+    foreach ( $robly_sublists as $this_sublist ) {
+
+        // add this sublist to the request
+        $post_request_data['sub_lists'] = $this_sublist;
+
+        curl_setopt( $ch, CURLOPT_URL, $post_url_subsequent_runs );
+        curl_setopt( $ch, CURLOPT_POST, 1 );
+        curl_setopt( $ch, CURLOPT_POSTFIELDS, $post_request_data );
+        curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
+
+        $post_result = curl_exec( $ch );
+
+        // check for cUrl errors and send email if needed
+        $post_result_array = json_decode( $post_result );
+        if ( $post_result_array->successful == 'false' ) {
+            $send_email = 'true';
+            $notification_content .= $post_result;
+        }
+    } // end sublist loop
+
+    // close cUrl connection
+    curl_close( $ch );
+
+    // send notification email if necessary
+    mail( $notification_email, 'Contact to manually add to Robly', $notification_content );
+}
