@@ -289,10 +289,10 @@ function submit_woo_customers_to_robly( $order_id ) {
     }
 
     // get customer info
-    $email = get_user_meta( $order->customer_user, 'billing_email' );
-    $first_name = get_user_meta( $order->customer_user, 'billing_first_name' );
-    $last_name = get_user_meta( $order->customer_user, 'billing_last_name' );
-    $state = get_user_meta( $order->customer_user, 'billing_state' );
+    $email = get_user_meta( $order->customer_user, 'billing_email', true );
+    $first_name = get_user_meta( $order->customer_user, 'billing_first_name', true );
+    $last_name = get_user_meta( $order->customer_user, 'billing_last_name', true );
+    $state = get_user_meta( $order->customer_user, 'billing_state', true );
 
     // set up data for the request
     $post_url_first_run = 'https://api.robly.com/api/v1/sign_up/generate?api_id=' . $robly_API_id . '&api_key=' . $robly_API_key;
