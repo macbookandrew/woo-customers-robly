@@ -79,14 +79,14 @@ function wcc_robly_settings_init() {
     add_settings_section(
         'wcc_robly_options_sublists_section',
         __( 'Email Lists', 'wcc_robly' ),
-        'wcc_robly_sublists_section_callback',
+        'wcc_robly_global_sublists_section_callback',
         'wcc_robly_options'
     );
 
     add_settings_field(
-        'wcc_robly_sublists',
+        'wcc_robly_global_sublists',
         __( 'Email Lists', 'wcc_robly' ),
-        'wcc_robly_sublists_render',
+        'wcc_robly_global_sublists_render',
         'wcc_robly_options',
         'wcc_robly_options_sublists_section'
     );
@@ -114,13 +114,13 @@ function wcc_robly_alternate_email_render() {
 }
 
 // print sublists field
-function wcc_robly_sublists_render() {
+function wcc_robly_global_sublists_render() {
     $options = get_option( 'wcc_robly_settings' );
 
     if ( $options['wcc_robly_api_id'] && $options['wcc_robly_api_key'] ) {
         $robly_API_id = $options['wcc_robly_api_id'];
         $robly_API_key = $options['wcc_robly_api_key'];
-        $selected_lists = $options['wcc_robly_sublists'];
+        $selected_lists = $options['wcc_robly_global_sublists'];
 
         // get all sublists from Robly API
         $sublists_ch = curl_init();
@@ -134,7 +134,7 @@ function wcc_robly_sublists_render() {
 
         // output form if there are valid lists
         if ( $all_sublists ) {
-            echo '<select multiple name="wcc_robly_settings[wcc_robly_sublists][]" size="' . count( $all_sublists ) . '">';
+            echo '<select multiple name="wcc_robly_settings[wcc_robly_global_sublists][]" size="' . count( $all_sublists ) . '">';
             // loop through all results
             foreach ( $all_sublists as $list ) {
                 echo '<option value="' . $list->sub_list->id . '"';
@@ -163,7 +163,7 @@ function wcc_robly_alternate_email_settings_section_callback() {
 }
 
 // print sublists section
-function wcc_robly_sublists_section_callback() {
+function wcc_robly_global_sublists_section_callback() {
     echo __( 'Choose the list(s) for all customers to be added to.', 'wcc_robly' );
 }
 
@@ -217,7 +217,7 @@ function wcc_robly_add_product_data_fields() {
         // get saved data
         $current_sublist_selections = maybe_unserialize( get_post_meta( $post->ID, '_wcc_robly_sublists', true ) );
 
-        // decode JSON return into array of checkboxes
+        // decode JSON return into array of choices
         $all_sublists = json_decode( $sublists_ch_response );
         if ( $all_sublists ) {
             // output select ?>
@@ -243,7 +243,7 @@ function wcc_robly_add_product_data_fields() {
     <?php
 }
 
-// save checkbox data
+// save data
 add_action( 'woocommerce_process_product_meta', 'wcc_robly_add_product_data_fields_save' );
 function wcc_robly_add_product_data_fields_save( $post_id ) {
     $wcc_robly_lists = $_POST['wcc_robly_sublists'];
