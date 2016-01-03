@@ -17,6 +17,10 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
+/**
+ * Add WP settings
+ */
+
 /* add settings page */
 add_action( 'admin_menu', 'wcc_robly_add_admin_menu' );
 add_action( 'admin_init', 'wcc_robly_settings_init' );
@@ -86,8 +90,6 @@ function wcc_robly_settings_init() {
         'wcc_robly_options',
         'wcc_robly_options_sublists_section'
     );
-
-
 }
 
 // print API ID field
@@ -145,26 +147,28 @@ function wcc_robly_sublists_render() {
             }
             echo '</select>';
         }
+    } else {
+        echo '<p>Please enter your Robly API ID and key above and save changes.</p>';
     }
 }
 
 // print API settings description
-function wcc_robly_api_settings_section_callback(  ) {
+function wcc_robly_api_settings_section_callback() {
     echo __( 'Enter your API Keys below. Don’t have any? <a href="mailto:support@robly.com?subject=API access">Request them here</a>.', 'wcc_robly' );
 }
 
 // print alternate email settings description
-function wcc_robly_alternate_email_settings_section_callback(  ) {
+function wcc_robly_alternate_email_settings_section_callback() {
     echo __( 'By default, failed API results will be emailed to the site administrator. To send to a different email address, enter it below; separate multiple addresses with commas.', 'wcc_robly' );
 }
 
 // print sublists section
-function wcc_robly_sublists_section_callback(  ) {
+function wcc_robly_sublists_section_callback() {
     echo __( 'Choose the list(s) for all customers to be added to.', 'wcc_robly' );
 }
 
 // print form
-function wcc_robly_options_page(  ) { ?>
+function wcc_robly_options_page() { ?>
     <div class="wrap">
        <h2>Woocommerce Customers to Robly</h2>
         <form action="options.php" method="post">
