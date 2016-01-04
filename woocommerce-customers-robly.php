@@ -236,7 +236,7 @@ function wcc_robly_add_product_data_fields() {
         <?php
         }
     } else {
-        echo '<p>Please check your <a href="' . get_site_url() .'/wp-admin/options-general.php?page=woocommerce-customers-robly">Robly API ID and key</a></p>';
+        echo '<p>Please check your <a href="' . get_site_url() .'/wp-admin/options-general.php?page=woocommerce-customers-robly">Robly API ID and key</a>.</p>';
     }
     ?>
     </div>
