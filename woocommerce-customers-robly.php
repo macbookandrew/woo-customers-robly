@@ -348,5 +348,7 @@ function submit_woo_customers_to_robly( $order_id ) {
     curl_close( $ch );
 
     // send notification email if necessary
-    mail( $notification_email, 'Contact to manually add to Robly', $notification_content );
+    if ( $send_email ) {
+        $email_sent = mail( $notification_email, 'Contact to manually add to Robly', $notification_content );
+    }
 }
