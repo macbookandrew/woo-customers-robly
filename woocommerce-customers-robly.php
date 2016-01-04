@@ -333,15 +333,18 @@ function submit_woo_customers_to_robly( $order_id ) {
     $user_parameters = http_build_query( $user_parameters );
 
     // add sublist IDs
+    $post_data = NULL;
     if ( $robly_sublists ) {
         foreach ( $robly_sublists as $this_list ) {
-            $user_parameters .= '&sublists[]=' . $this_list;
+            $post_data .= 'sub_lists[]=' . $this_list . '&';
         }
     }
+    $post_data = rtrim( $post_data, '&' );
 
     // set up the rest of the request
     curl_setopt( $ch, CURLOPT_URL, $API_base . $API_method . $API_credentials . '&' . $user_parameters );
     curl_setopt( $ch, CURLOPT_POST, 1 );
+    curl_setopt( $ch, CURLOPT_POSTFIELDS, $post_data );
     curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
 
     // run the request and check to see if manual email is needed
