@@ -1,7 +1,7 @@
 <?php
 /*
  * Plugin Name: WooCommerce Customers to Robly
- * Version: 1.1
+ * Version: 1.1.1
  * Description: Adds WooCommerce customers to Robly using their API
  * Author: AndrewRMinion Design
  * Author URI: https://andrewrminion.com
