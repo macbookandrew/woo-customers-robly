@@ -1,7 +1,7 @@
 <?php
 /*
  * Plugin Name: WooCommerce Customers to Robly
- * Version: 1.0
+ * Version: 1.1
  * Description: Adds WooCommerce customers to Robly using their API
  * Author: AndrewRMinion Design
  * Author URI: https://andrewrminion.com
@@ -262,10 +262,12 @@ add_action( 'woocommerce_payment_complete', 'submit_woo_customers_to_robly', 10,
 function submit_woo_customers_to_robly( $order_id ) {
     global $wpdb;
 
-    // get API keys
+    // get API keys and URL
     $options = get_option( 'wcc_robly_settings' );
     $robly_API_id = $options['wcc_robly_api_id'];
     $robly_API_key = $options['wcc_robly_api_key'];
+    $API_base = 'https://api.robly.com/api/v1/';
+    $API_credentials = '?api_id=' . $robly_API_id . '&api_key=' . $robly_API_key;
 
     // set notification email address
     if ( $options['alternate_email'] ) {
@@ -283,13 +285,16 @@ function submit_woo_customers_to_robly( $order_id ) {
     // loop through order items to get Robly sublist IDs
     foreach ( $order->get_items() as $item ) {
         $item_robly_lists = get_post_meta( $item['product_id'], '_wcc_robly_sublists', true );
-        foreach ( maybe_unserialize( $item_robly_lists ) as $this_sublist ) {
-            $robly_sublists[] = $this_sublist;
+        if ( $item_robly_lists ) {
+            foreach ( maybe_unserialize( $item_robly_lists ) as $this_sublist ) {
+                $robly_sublists[] = $this_sublist;
+            }
         }
     }
 
     // get customer info
     $user_meta = get_user_meta( $order->customer_user );
+    $email = $user_meta['billing_email'][0];
     $first_name = $user_meta['billing_first_name'][0];
     $last_name = $user_meta['billing_last_name'][0];
     $street_address_1 = $user_meta['billing_address_1'][0];
@@ -298,10 +303,23 @@ function submit_woo_customers_to_robly( $order_id ) {
     $zip = $user_meta['billing_postcode'][0];
     $phone = $user_meta['billing_phone'][0];
 
-    // set up data for the request
-    $post_url_first_run = 'https://api.robly.com/api/v1/sign_up/generate?api_id=' . $robly_API_id . '&api_key=' . $robly_API_key;
-    $post_url_subsequent_runs = 'https://api.robly.com/api/v1/contacts/update_full_contact?api_id=' . $robly_API_id . '&api_key=' . $robly_API_key;
-    $post_request_data = array(
+    // search Robly for customer by email
+    $ch = curl_init();
+    curl_setopt( $ch, CURLOPT_URL, $API_base . 'contacts/search' . $API_credentials . '&email=' . $email );
+    curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
+    $curl_search = curl_exec( $ch );
+    $curl_search_response = json_decode( $curl_search );
+
+    // set API method for subsequent call
+    if ( $curl_search_response->member ) {
+        $API_method = 'contacts/update_full_contact';
+    } else {
+        $API_method = 'sign_up/generate';
+    }
+
+    // set up user data for the request
+    $post_url = $API_method . $API_credentials;
+    $user_parameters = array(
         'email'         => $email,
         'fname'         => $first_name,
         'lname'         => $last_name,
@@ -312,43 +330,31 @@ function submit_woo_customers_to_robly( $order_id ) {
         'data11'        => $zip,
         'data5'         => $phone
     );
+    $user_parameters = http_build_query( $user_parameters );
 
-    // send request via cUrl
-    $ch = curl_init();
+    // add sublist IDs
+    if ( $robly_sublists ) {
+        foreach ( $robly_sublists as $this_list ) {
+            $user_parameters .= '&sublists[]=' . $this_list;
+        }
+    }
 
-    curl_setopt( $ch, CURLOPT_URL, $post_url_first_run );
+    // set up the rest of the request
+    curl_setopt( $ch, CURLOPT_URL, $API_base . $API_method . $API_credentials . '&' . $user_parameters );
     curl_setopt( $ch, CURLOPT_POST, 1 );
-    curl_setopt( $ch, CURLOPT_POSTFIELDS, $post_request_data );
     curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
 
-    $first_curl_response = curl_exec( $ch );
-
-    // get sublist(s) and run cUrl for each since PHP won’t allow duplicate array keys and Robly requires sub_lists[] => each list ID
-    foreach ( $robly_sublists as $this_sublist ) {
-
-        // add this sublist to the request
-        $post_request_data['sub_lists'] = $this_sublist;
-
-        curl_setopt( $ch, CURLOPT_URL, $post_url_subsequent_runs );
-        curl_setopt( $ch, CURLOPT_POST, 1 );
-        curl_setopt( $ch, CURLOPT_POSTFIELDS, $post_request_data );
-        curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
-
-        $post_result = curl_exec( $ch );
-
-        // check for cUrl errors and send email if needed
-        $post_result_array = json_decode( $post_result );
-        if ( $post_result_array->successful == 'false' ) {
-            $send_email = 'true';
-            $notification_content .= $post_result;
-        }
-    } // end sublist loop
+    // run the request and check to see if manual email is needed
+    $user_curl_response = curl_exec( $ch );
+    if ( json_decode( $user_curl_response )->successful !== 'true' ) {
+        $send_email = true;
+    }
 
     // close cUrl connection
     curl_close( $ch );
 
     // send notification email if necessary
     if ( $send_email ) {
-        $email_sent = mail( $notification_email, 'Contact to manually add to Robly', $notification_content );
+        $email_sent = mail( $notification_email, 'Contact to manually add to Robly', 'API failure' . "\n\n" . $user_parameters );
     }
 }
