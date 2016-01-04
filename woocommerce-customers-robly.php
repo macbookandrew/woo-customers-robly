@@ -289,10 +289,14 @@ function submit_woo_customers_to_robly( $order_id ) {
     }
 
     // get customer info
-    $email = get_user_meta( $order->customer_user, 'billing_email', true );
-    $first_name = get_user_meta( $order->customer_user, 'billing_first_name', true );
-    $last_name = get_user_meta( $order->customer_user, 'billing_last_name', true );
-    $state = get_user_meta( $order->customer_user, 'billing_state', true );
+    $user_meta = get_user_meta( $order->customer_user );
+    $first_name = $user_meta['billing_first_name'][0];
+    $last_name = $user_meta['billing_last_name'][0];
+    $street_address_1 = $user_meta['billing_address_1'][0];
+    $city = $user_meta['billing_city'][0];
+    $state = $user_meta['billing_state'][0];
+    $zip = $user_meta['billing_postcode'][0];
+    $phone = $user_meta['billing_phone'][0];
 
     // set up data for the request
     $post_url_first_run = 'https://api.robly.com/api/v1/sign_up/generate?api_id=' . $robly_API_id . '&api_key=' . $robly_API_key;
@@ -301,7 +305,12 @@ function submit_woo_customers_to_robly( $order_id ) {
         'email'         => $email,
         'fname'         => $first_name,
         'lname'         => $last_name,
-        'state'         => $state
+        'data8'         => $street_address_1,
+        'data9'         => $city,
+        'data10'        => $state,
+        'data22'        => $state,
+        'data11'        => $zip,
+        'data5'         => $phone
     );
 
     // send request via cUrl
