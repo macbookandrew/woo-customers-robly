@@ -226,7 +226,7 @@ function wcc_robly_add_product_data_fields() {
                 <select multiple name="wcc_robly_sublists[]" size="<?php count( $all_sublists ); ?>">
                 <?php foreach ( $all_sublists as $list ) {
                     echo '<option value="' . $list->sub_list->id . '"';
-                    if ( in_array( $list->sub_list->id, $current_sublist_selections ) ) {
+                    if ( $current_sublist_selections && in_array( $list->sub_list->id, $current_sublist_selections ) ) {
                         echo ' selected="selected"';
                     }
                     echo '>' . $list->sub_list->name . '</option>';
