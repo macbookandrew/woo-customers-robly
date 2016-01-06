@@ -27,7 +27,7 @@ add_action( 'admin_init', 'wcc_robly_settings_init' );
 
 // add to menu
 function wcc_robly_add_admin_menu() {
-    add_options_page( 'Woocommerce Customers to Robly', 'Woocommerce to Robly', 'manage_options', 'woocommerce-customers-robly', 'wcc_robly_options_page' );
+    add_options_page( 'WooCommerce Customers to Robly', 'WooCommerce to Robly', 'manage_options', 'woocommerce-customers-robly', 'wcc_robly_options_page' );
 }
 
 // add settings section and fields
@@ -170,7 +170,7 @@ function wcc_robly_global_sublists_section_callback() {
 // print form
 function wcc_robly_options_page() { ?>
     <div class="wrap">
-       <h2>Woocommerce Customers to Robly</h2>
+       <h2>WooCommerce Customers to Robly</h2>
         <form action="options.php" method="post">
 
             <?php
@@ -257,7 +257,7 @@ function wcc_robly_add_product_data_fields_save( $post_id ) {
  * Add customer emails to Robly
  */
 
-/* hook into Woocommerce payment complete */
+/* hook into WooCommerce payment complete */
 add_action( 'woocommerce_payment_complete', 'submit_woo_customers_to_robly', 10, 1 );
 function submit_woo_customers_to_robly( $order_id ) {
     global $wpdb;
