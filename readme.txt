@@ -14,8 +14,9 @@ Adds WooCommerce customers to one or more Robly lists, optionally based on the p
 
 Robly is an email marketing service provider that allows customers to be in multiple lists for targeted marketing purposes. Using Robly’s API, this plugin adds WooCommerce customers to one or more Robly lists, optionally based on the product(s) they purchased.
 
-Requries an active Robly account as well as WooCommerce.
+[Robly](https://www.robly.com/) is a paid email marketing service provider that helps you send emails to large numbers of people at once.
 
+This plugin requires an active Robly account as well as WooCommerce. You’ll also need to <a href="mailto:support@robly.com?subject=API access">contact Robly support</a> to get an API ID and key for your account.
 
 == Installation ==
 
@@ -28,7 +29,7 @@ Requries an active Robly account as well as WooCommerce.
 
 = What is Robly? =
 
-Robly is an email marketing service provider that helps you send emails to large numbers of people at once.
+[Robly](https://www.robly.com/) is a paid email marketing service provider that helps you send emails to large numbers of people at once.
 
 = What do I need to use this plugin? =
 
