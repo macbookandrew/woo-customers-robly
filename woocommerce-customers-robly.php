@@ -349,7 +349,7 @@ function submit_woo_customers_to_robly( $order_id ) {
 
     // run the request and check to see if manual email is needed
     $user_curl_response = curl_exec( $ch );
-    if ( json_decode( $user_curl_response )->successful !== 'true' ) {
+    if ( json_decode( $user_curl_response )->successful != true ) {
         $send_email = true;
     }
 
