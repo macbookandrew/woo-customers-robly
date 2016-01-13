@@ -1,10 +1,10 @@
 === WooCommerce Customers to Robly ===
 Contributors: macbookandrew
 Donate link: https://cash.me/$AndrewRMinionDesign
-Tags: woocommerce, robly, email
+Tags: woocommerce, robly, email, automation, customer
 Requires at least: 3.0.1
 Tested up to: 4.4
-Stable tag: 1.1.2
+Stable tag: 1.1.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -50,6 +50,10 @@ API stands for “Application Programming Interface,” which basically means co
 2. Per-product settings
 
 == Changelog ==
+
+= 1.1.3 =
+* Fix emails being sent on successful API call
+* Add some more debugging info to failed API calls
 
 = 1.1.2 =
 * Update documentation and add banner for WP plugin directory
