@@ -358,6 +358,6 @@ function submit_woo_customers_to_robly( $order_id ) {
 
     // send notification email if necessary
     if ( $send_email ) {
-        $email_sent = mail( $notification_email, 'Contact to manually add to Robly', 'API failure' . "\n\n" . $user_parameters );
+        $email_sent = mail( $notification_email, 'Contact to manually add to Robly', 'API failure' . "\n\n" . $API_base . '?api_id=XXX&api_key=XXX?' . $API_method . $user_parameters . "\n\nDetails:\n\n" . json_decode( $user_curl_response ) );
     }
 }
