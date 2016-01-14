@@ -349,7 +349,8 @@ function submit_woo_customers_to_robly( $order_id ) {
 
     // run the request and check to see if manual email is needed
     $user_curl_response = curl_exec( $ch );
-    if ( json_decode( $user_curl_response )->successful != true ) {
+    $json_response = json_decode( $user_curl_response );
+    if ( $json_response->successful != true ) {
         $send_email = true;
     }
 
@@ -358,6 +359,6 @@ function submit_woo_customers_to_robly( $order_id ) {
 
     // send notification email if necessary
     if ( $send_email ) {
-        $email_sent = mail( $notification_email, 'Contact to manually add to Robly', 'API failure' . "\n\n" . $API_base . '?api_id=XXX&api_key=XXX?' . $API_method . $user_parameters . "\n\nDetails:\n\n" . json_decode( $user_curl_response ) );
+        $email_sent = mail( $notification_email, 'Contact to manually add to Robly', "API failure\n\n" . $API_base . $API_method . '?api_id=XXX&api_key=XXX&' . $user_parameters . "\n\nDetails:\n\n" . json_decode( $user_curl_response ) . "\n\nSent by WooCommerce Customers to Robly on " . home_url() );
     }
 }
