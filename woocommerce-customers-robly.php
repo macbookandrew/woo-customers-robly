@@ -1,11 +1,11 @@
 <?php
 /*
  * Plugin Name: WooCommerce Customers to Robly
- * Version: 1.1.2
+ * Version: 1.1.3
  * Description: Adds WooCommerce customers to Robly using their API
  * Author: AndrewRMinion Design
  * Author URI: https://andrewrminion.com
- * Plugin URI: PLUGIN SITE HERE
+ * Plugin URI: http://code.andrewrminion.com/woocommerce-customers-to-robly/
  * Text Domain: woocommerce-customers-robly
  * Domain Path: /languages
  * License: GPL2
@@ -349,7 +349,8 @@ function submit_woo_customers_to_robly( $order_id ) {
 
     // run the request and check to see if manual email is needed
     $user_curl_response = curl_exec( $ch );
-    if ( json_decode( $user_curl_response )->successful !== 'true' ) {
+    $json_response = json_decode( $user_curl_response );
+    if ( $json_response->successful != true ) {
         $send_email = true;
     }
 
@@ -358,6 +359,6 @@ function submit_woo_customers_to_robly( $order_id ) {
 
     // send notification email if necessary
     if ( $send_email ) {
-        $email_sent = mail( $notification_email, 'Contact to manually add to Robly', 'API failure' . "\n\n" . $user_parameters );
+        $email_sent = mail( $notification_email, 'Contact to manually add to Robly', "API failure\n\n" . $API_base . $API_method . '?api_id=XXX&api_key=XXX&' . $user_parameters . "\n\nDetails:\n\n" . json_decode( $user_curl_response ) . "\n\nSent by WooCommerce Customers to Robly on " . home_url() );
     }
 }

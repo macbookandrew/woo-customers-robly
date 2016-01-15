@@ -24,6 +24,9 @@ module.exports = function( grunt ) {
 					'README.md': 'readme.txt'
 				}
 			},
+            options: {
+                screenshot_url: 'http://ps.w.org/woo-customers-robly/assets/{screenshot}.png',
+            }
 		},
 
 		makepot: {
