@@ -168,7 +168,7 @@ function wcc_robly_alternate_email_settings_section_callback() {
 
 // print sublists section
 function wcc_robly_global_sublists_section_callback() {
-    echo __( 'Choose the list(s) for all customers to be added to.', 'wcc_robly' );
+    echo __( 'Choose the list(s) for all customers to be added to. You can also choose individual lists per product; <a href="' . get_admin_url() . 'edit.php?post_type=product">edit a product</a> and go to the &ldquo;Robly&rdquo; Product Data tab.', 'wcc_robly' );
 }
 
 // print form
@@ -226,7 +226,7 @@ function wcc_robly_add_product_data_fields() {
         if ( $all_sublists ) {
             // output select ?>
             <p class="form-field">
-                <label for="wcc_robly_sublists[]">Choose the list(s) to add this customer to:</label>
+                <label for="wcc_robly_sublists[]">Choose the list(s) to add customers to:</label>
                 <select multiple name="wcc_robly_sublists[]" size="<?php count( $all_sublists ); ?>">
                 <?php foreach ( $all_sublists as $list ) {
                     echo '<option value="' . $list->sub_list->id . '"';
@@ -237,10 +237,11 @@ function wcc_robly_add_product_data_fields() {
                 } ?>
                 </select>
             </p>
+            <p>You can also select list(s) to add all customers to on the <a href="<?php echo get_admin_url() ?>options-general.php?page=woocommerce-customers-robly">settings page</a>.</p>
         <?php
         }
     } else {
-        echo '<p>Please check your <a href="' . get_site_url() .'/wp-admin/options-general.php?page=woocommerce-customers-robly">Robly API ID and key</a>.</p>';
+        echo '<p>Please check your <a href="' . get_admin_url() .'options-general.php?page=woocommerce-customers-robly">Robly API ID and key</a>.</p>';
     }
     ?>
     </div>
