@@ -351,7 +351,7 @@ function submit_woo_customers_to_robly( $order_id ) {
         'data10'        => urlencode( $state ),
         'data22'        => urlencode( $state ),
         'data11'        => urlencode( $zip ),
-        'data5'         => urlencode( $phon )e
+        'data5'         => urlencode( $phone )
     );
     $user_parameters = http_build_query( $user_parameters );
 
