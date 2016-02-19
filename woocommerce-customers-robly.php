@@ -453,7 +453,6 @@ function submit_woo_customers_to_robly( $order_id ) {
     }
 
     // get customer info
-
     $customer_info = $order->get_address();
     $email = $customer_info['email'];
     $first_name = $customer_info['first_name'];
@@ -463,6 +462,7 @@ function submit_woo_customers_to_robly( $order_id ) {
     $state = $customer_info['state'];
     $zip = $customer_info['postcode'];
     $phone = $customer_info['phone'];
+
     // search Robly for customer by email
     $ch = curl_init();
     curl_setopt( $ch, CURLOPT_URL, $API_base . 'contacts/search' . $API_credentials . '&email=' . $email );
