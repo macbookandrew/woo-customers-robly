@@ -120,7 +120,11 @@ function wcc_robly_global_sublists_render() {
     if ( $options['wcc_robly_api_id'] && $options['wcc_robly_api_key'] ) {
         $robly_API_id = $options['wcc_robly_api_id'];
         $robly_API_key = $options['wcc_robly_api_key'];
-        $selected_lists = $options['wcc_robly_global_sublists'];
+        if ( isset( $options['wcc_robly_global_sublists'] ) ) {
+            $selected_lists = $options['wcc_robly_global_sublists'];
+        } else {
+            $selected_lists = array();
+        }
 
         // get all sublists from Robly API
         $sublists_ch = curl_init();
@@ -270,7 +274,7 @@ function submit_woo_customers_to_robly( $order_id ) {
     $API_credentials = '?api_id=' . $robly_API_id . '&api_key=' . $robly_API_key;
 
     // set notification email address
-    if ( $options['alternate_email'] ) {
+    if ( isset( $options['alternate_email'] ) ) {
         $notification_email = $options['alternate_email'];
     } else {
         $notification_email = get_option( 'admin_email' );
@@ -311,7 +315,7 @@ function submit_woo_customers_to_robly( $order_id ) {
     $curl_search_response = json_decode( $curl_search );
 
     // set API method for subsequent call
-    if ( $curl_search_response->member ) {
+    if ( isset( $curl_search_response->member ) ) {
         $API_method = 'contacts/update_full_contact';
     } else {
         $API_method = 'sign_up/generate';
@@ -352,6 +356,8 @@ function submit_woo_customers_to_robly( $order_id ) {
     $json_response = json_decode( $user_curl_response );
     if ( $json_response->successful != true || ( $json_response->successful == true && strpos( $json_response->message, 'already exists' ) !== false ) ) {
         $send_email = true;
+    } else {
+        $send_email = false;
     }
 
     // close cUrl connection
