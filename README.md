@@ -57,6 +57,7 @@ API stands for “Application Programming Interface,” which basically means co
 
 ### 1.2 ###
 * Resubscribe deleted/unsubscribed users
+* Correctly get customer info if “guest checkout” is enabled
 * Minor bugfixes
 
 ### 1.1.4 ###
