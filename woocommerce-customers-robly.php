@@ -297,16 +297,16 @@ function submit_woo_customers_to_robly( $order_id ) {
     }
 
     // get customer info
-    $user_meta = get_user_meta( $order->customer_user );
-    $email = $user_meta['billing_email'][0];
-    $first_name = $user_meta['billing_first_name'][0];
-    $last_name = $user_meta['billing_last_name'][0];
-    $street_address_1 = $user_meta['billing_address_1'][0];
-    $city = $user_meta['billing_city'][0];
-    $state = $user_meta['billing_state'][0];
-    $zip = $user_meta['billing_postcode'][0];
-    $phone = $user_meta['billing_phone'][0];
 
+    $customer_info = $order->get_address();
+    $email = $customer_info['email'];
+    $first_name = $customer_info['first_name'];
+    $last_name = $customer_info['last_name'];
+    $street_address_1 = $customer_info['address_1'];
+    $city = $customer_info['city'];
+    $state = $customer_info['state'];
+    $zip = $customer_info['postcode'];
+    $phone = $customer_info['phone'];
     // search Robly for customer by email
     $ch = curl_init();
     curl_setopt( $ch, CURLOPT_URL, $API_base . 'contacts/search' . $API_credentials . '&email=' . $email );
