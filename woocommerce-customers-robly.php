@@ -18,6 +18,40 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * Set up array with available WooCommerce fields
+ */
+global $woocommerce_datafields;
+$woocommerce_datafields = apply_filters( 'wcc_woocommerce_datafields', array(
+    ''                      => '- Ignore -',
+    'billing_email'         => 'Billing Email',
+    'billing_first_name'    => 'Billing First Name',
+    'billing_last_name'     => 'Billing Last Name',
+    'billing_company'       => 'Billing Company',
+    'billing_address_1'     => 'Billing Address 1',
+    'billing_address_2'     => 'Billing Address 2',
+    'billing_city'          => 'Billing City',
+    'billing_state'         => 'Billing State',
+    'billing_postcode'      => 'Billing Postal Code',
+    'billing_country'       => 'Billing Country',
+    'billing_phone'         => 'Billing Phone',
+    'shipping_email'        => 'Shipping Email',
+    'shipping_first_name'   => 'Shipping First Name',
+    'shipping_last_name'    => 'Shipping Last Name',
+    'shipping_company'      => 'Shipping Company',
+    'shipping_address_1'    => 'Shipping Address 1',
+    'shipping_address_2'    => 'Shipping Address 2',
+    'shipping_city'         => 'Shipping City',
+    'shipping_state'        => 'Shipping State',
+    'shipping_postcode'     => 'Shipping Postal Code',
+    'shipping_country'      => 'Shipping Country',
+    'shipping_phone'        => 'Shipping Phone',
+    'shipping_method_title' => 'Shipping Method',
+    'order_date'            => 'Order Date',
+    'order_total'           => 'Order Total',
+    'customer_ip_address'   => 'Customer IP Address',
+) );
+
+/**
  * Add WP settings
  */
 
@@ -90,6 +124,23 @@ function wcc_robly_settings_init() {
         'wcc_robly_options',
         'wcc_robly_options_sublists_section'
     );
+
+
+    // data fields settings
+    add_settings_section(
+        'wcc_robly_options_datafields_section',
+        __( 'Data Fields Mappings', 'wcc_robly' ),
+        'wcc_robly_global_datafields_section_callback',
+        'wcc_robly_options'
+    );
+
+    add_settings_field(
+        'wcc_robly_datafields',
+        __( 'Data Fields', 'wcc_robly' ),
+        'wcc_robly_datafields_render',
+        'wcc_robly_options',
+        'wcc_robly_options_datafields_section'
+    );
 }
 
 // print API ID field
@@ -156,6 +207,104 @@ function wcc_robly_global_sublists_render() {
     }
 }
 
+// print data fields field
+function wcc_robly_datafields_render() {
+    $options = get_option( 'wcc_robly_settings' );
+
+    if ( $options['wcc_robly_api_id'] && $options['wcc_robly_api_key'] ) {
+        $robly_API_id = $options['wcc_robly_api_id'];
+        $robly_API_key = $options['wcc_robly_api_key'];
+        if ( isset( $options['wcc_robly_datafields'] ) ) {
+            $selected_datafields = $options['wcc_robly_datafields'];
+        } else {
+            $selected_datafields = array();
+        }
+
+        // get all data fields from Robly API
+        $datafields_ch = curl_init();
+        curl_setopt( $datafields_ch, CURLOPT_URL, 'https://api.robly.com/api/v1/fields/show?api_id=' . $robly_API_id . '&api_key=' . $robly_API_key . '&include_all=true' );
+        curl_setopt( $datafields_ch, CURLOPT_RETURNTRANSFER, true );
+        $datafields_ch_response = curl_exec( $datafields_ch );
+        curl_close( $datafields_ch );
+
+        // decode JSON return
+        $all_datafields = json_decode( $datafields_ch_response );
+
+        // output form if there are valid lists
+        if ( $all_datafields ) {
+            // sort into required vs. optional fields
+            $required_datafields = NULL;
+            $optional_datafields = NULL;
+            foreach ( $all_datafields as $datafield ) {
+                if ( $datafield->field_tag->is_required == true ) {
+                    $required_datafields[$datafield->field_tag->user_tag] = $datafield->field_tag;
+                } else {
+                    $optional_datafields[$datafield->field_tag->user_tag] = $datafield->field_tag;
+                }
+            }
+
+            // sort arrays
+            usort( $required_datafields, 'sort_by_datafield_id' );
+            usort( $optional_datafields, 'sort_by_datafield_id' );
+
+            // output datafields
+            echo '<table>';
+
+            // required
+            echo '<tr><td colspan="2"><strong>Required Fields</strong></td></tr>';
+            foreach( $required_datafields as $datafield ) {
+                datafield_mapping( $datafield );
+            }
+
+            // optional
+            echo '<tr><td colspan="2"><strong>Optional Fields</strong></td></tr>';
+            foreach( $optional_datafields as $datafield ) {
+                datafield_mapping( $datafield );
+            }
+
+            echo '</table>';
+        }
+
+    } else {
+        echo '<p>Please enter your Robly API ID and key above and save changes.</p>';
+    }
+}
+
+// sort objects in array
+function sort_by_datafield_id( $a, $b ) {
+    return strcmp( $a->id, $b->id );
+}
+
+// set up individual data field mappings
+function datafield_mapping( $datafield ) {
+    global $woocommerce_datafields;
+    $options = get_option( 'wcc_robly_settings' );
+    // get datafields mappings
+    if ( isset( $options['wcc_robly_datafields'] ) ) {
+        $robly_datafields = $options['wcc_robly_datafields'];
+    } else {
+        $robly_datafields = array();
+    }
+
+    echo '<tr>';
+    echo '<td><label for=">' . $datafield->user_tag . '">' . $datafield->label . '</label></td>';
+    echo '<td><select name="wcc_robly_settings[wcc_robly_datafields][' . $datafield->user_tag . ']">';
+    // loop over WooCommerce fields
+    foreach ( $woocommerce_datafields as $key => $value ) {
+        echo '<option value="' . $key . '"';
+
+        // mark as selected if chosen
+        if ( $robly_datafields ) {
+            if ( $datafield->user_tag == array_search( $key, $robly_datafields ) ) {
+                echo ' selected="selected"';
+            }
+        }
+        echo '>' . $value . '</option>';
+    }
+    echo '</select></td>';
+    echo '</tr>';
+}
+
 // print API settings description
 function wcc_robly_api_settings_section_callback() {
     echo __( 'Enter your API Keys below. Don’t have any? <a href="mailto:support@robly.com?subject=API access">Request them here</a>.', 'wcc_robly' );
@@ -169,6 +318,11 @@ function wcc_robly_alternate_email_settings_section_callback() {
 // print sublists section
 function wcc_robly_global_sublists_section_callback() {
     echo __( 'Choose the list(s) for all customers to be added to. You can also choose individual lists per product; <a href="' . get_admin_url() . 'edit.php?post_type=product">edit a product</a> and go to the &ldquo;Robly&rdquo; Product Data tab.', 'wcc_robly' );
+}
+
+// print datafields section
+function wcc_robly_global_datafields_section_callback() {
+    echo __( 'Map your Robly custom data fields to customer information fields.', 'wcc_robly' );
 }
 
 // print form
