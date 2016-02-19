@@ -1,7 +1,7 @@
 <?php
 /*
  * Plugin Name: WooCommerce Customers to Robly
- * Version: 1.2
+ * Version: 1.2.1
  * Description: Adds WooCommerce customers to Robly using their API
  * Author: AndrewRMinion Design
  * Author URI: https://andrewrminion.com
@@ -299,14 +299,14 @@ function submit_woo_customers_to_robly( $order_id ) {
 
     // get customer info
     $customer_info = $order->get_address();
-    $email = $customer_info['email'];
-    $first_name = $customer_info['first_name'];
-    $last_name = $customer_info['last_name'];
-    $street_address_1 = $customer_info['address_1'];
-    $city = $customer_info['city'];
-    $state = $customer_info['state'];
-    $zip = $customer_info['postcode'];
-    $phone = $customer_info['phone'];
+    $email = urlencode( $customer_info['email'] );
+    $first_name = urlencode( $customer_info['first_name'] );
+    $last_name = urlencode( $customer_info['last_name'] );
+    $street_address_1 = urlencode( $customer_info['address_1'] );
+    $city = urlencode( $customer_info['city'] );
+    $state = urlencode( $customer_info['state'] );
+    $zip = urlencode( $customer_info['postcode'] );
+    $phone = urlencode( $customer_info['phone'] );
 
     // search Robly for customer by email
     $ch = curl_init();
@@ -343,15 +343,15 @@ function submit_woo_customers_to_robly( $order_id ) {
     // set up user data for the request
     $post_url = $API_method . $API_credentials;
     $user_parameters = array(
-        'email'         => $email,
-        'fname'         => $first_name,
-        'lname'         => $last_name,
-        'data8'         => $street_address_1,
-        'data9'         => $city,
-        'data10'        => $state,
-        'data22'        => $state,
-        'data11'        => $zip,
-        'data5'         => $phone
+        'email'         => urlencode( $email ),
+        'fname'         => urlencode( $first_name ),
+        'lname'         => urlencode( $last_name ),
+        'data8'         => urlencode( $street_address_1 ),
+        'data9'         => urlencode( $city ),
+        'data10'        => urlencode( $state ),
+        'data22'        => urlencode( $state ),
+        'data11'        => urlencode( $zip ),
+        'data5'         => urlencode( $phon )e
     );
     $user_parameters = http_build_query( $user_parameters );
 
