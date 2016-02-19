@@ -265,6 +265,7 @@ function wcc_robly_add_product_data_fields_save( $post_id ) {
 add_action( 'woocommerce_payment_complete', 'submit_woo_customers_to_robly', 10, 1 );
 function submit_woo_customers_to_robly( $order_id ) {
     global $wpdb;
+    $error_message = NULL;
 
     // get API keys and URL
     $options = get_option( 'wcc_robly_settings' );
@@ -316,7 +317,25 @@ function submit_woo_customers_to_robly( $order_id ) {
 
     // set API method for subsequent call
     if ( isset( $curl_search_response->member ) ) {
+        // handle deleted/unsubscribed members
+        if ( $curl_search_response->member->is_subscribed == false || $curl_search_response->member->is_deleted == true ) {
+            curl_setopt( $ch, CURLOPT_URL, $API_base . 'contacts/resubscribe' . $API_credentials . '&email=' . $email );
+            curl_setopt( $ch, CURLOPT_POST, 1 );
+            curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
+
+            // run the request and check to see if manual email is needed
+            $resubscribe_curl_response = curl_exec( $ch );
+            $json_response = json_decode( $resubscribe_curl_response );
+            if ( $json_response->successful != true ) {
+                $send_email = true;
+                $error_message .= 'Resubscribe: ' . json_decode( $resubscribe_curl_response )->message;
+            } else {
+                $send_email = false;
+            }
+        }
+        // continue with updating contact info
         $API_method = 'contacts/update_full_contact';
+    // handle new members
     } else {
         $API_method = 'sign_up/generate';
     }
@@ -356,6 +375,7 @@ function submit_woo_customers_to_robly( $order_id ) {
     $json_response = json_decode( $user_curl_response );
     if ( $json_response->successful != true || ( $json_response->successful == true && strpos( $json_response->message, 'already exists' ) !== false ) ) {
         $send_email = true;
+        $error_message .= 'Update Contact: ' . json_decode( $user_curl_response )->message;
     } else {
         $send_email = false;
     }
@@ -365,6 +385,6 @@ function submit_woo_customers_to_robly( $order_id ) {
 
     // send notification email if necessary
     if ( $send_email ) {
-        $email_sent = mail( $notification_email, 'Contact to manually add to Robly', "API failure\n\nAPI call:\n" . $API_base . $API_method . '?api_id=XXX&api_key=XXX&' . $user_parameters . "\nLists: " . $post_data . "\n\nDetails:\n" . json_decode( $user_curl_response )->message . "\n\nSent by the WooCommerce Customers to Robly plugin on " . home_url() );
+        $email_sent = mail( $notification_email, 'Contact to manually add to Robly', "API failure\n\nAPI call:\n" . $API_base . $API_method . '?api_id=XXX&api_key=XXX&' . $user_parameters . "\nLists: " . $post_data . "\n\nDetails:\n" . $error_message . "\n\nSent by the WooCommerce Customers to Robly plugin on " . home_url() );die();
     }
 }
