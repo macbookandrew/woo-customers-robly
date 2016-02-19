@@ -17,6 +17,8 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
+#TODO: cache Robly sublists and datafields to options table, add button to manually refresh, add timer to auto-refresh after a month?
+
 /**
  * Set up array with available WooCommerce fields
  */
@@ -301,6 +303,7 @@ function datafield_mapping( $datafield ) {
         }
         echo '>' . $value . '</option>';
     }
+    #TODO: add “custom” option with an input for custom data
     echo '</select></td>';
     echo '</tr>';
 }
@@ -462,6 +465,7 @@ function submit_woo_customers_to_robly( $order_id ) {
     $state = $customer_info['state'];
     $zip = $customer_info['postcode'];
     $phone = $customer_info['phone'];
+    #TODO: add all available WooCommerce fields as at top of file (use apply_filter)
 
     // search Robly for customer by email
     $ch = curl_init();
@@ -508,6 +512,8 @@ function submit_woo_customers_to_robly( $order_id ) {
         'data11'        => $zip,
         'data5'         => $phone
     );
+    #TODO: get wcc_robly_datafields option and loop through, assigning keys to the customer variables
+
     $user_parameters = http_build_query( $user_parameters );
 
     // add sublist IDs
