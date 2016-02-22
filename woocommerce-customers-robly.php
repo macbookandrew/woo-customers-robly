@@ -1,7 +1,7 @@
 <?php
 /*
  * Plugin Name: WooCommerce Customers to Robly
- * Version: 1.2.1
+ * Version: 1.2.3
  * Description: Adds WooCommerce customers to Robly using their API
  * Author: AndrewRMinion Design
  * Author URI: https://andrewrminion.com
@@ -299,14 +299,14 @@ function submit_woo_customers_to_robly( $order_id ) {
 
     // get customer info
     $customer_info = $order->get_address();
-    $email = urlencode( $customer_info['email'] );
-    $first_name = urlencode( $customer_info['first_name'] );
-    $last_name = urlencode( $customer_info['last_name'] );
-    $street_address_1 = urlencode( $customer_info['address_1'] );
-    $city = urlencode( $customer_info['city'] );
-    $state = urlencode( $customer_info['state'] );
-    $zip = urlencode( $customer_info['postcode'] );
-    $phone = urlencode( $customer_info['phone'] );
+    $email = str_replace( '+', '%2B', $customer_info['email'] );
+    $first_name = $customer_info['first_name'];
+    $last_name = $customer_info['last_name'];
+    $street_address_1 = $customer_info['address_1'];
+    $city = $customer_info['city'];
+    $state = $customer_info['state'];
+    $zip = $customer_info['postcode'];
+    $phone = $customer_info['phone'];
 
     // search Robly for customer by email
     $ch = curl_init();

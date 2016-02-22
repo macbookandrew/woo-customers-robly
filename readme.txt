@@ -4,7 +4,7 @@ Donate link: https://cash.me/$AndrewRMinionDesign
 Tags: woocommerce, robly, email, automation, customer
 Requires at least: 3.0.1
 Tested up to: 4.4
-Stable tag: 1.2.1
+Stable tag: 1.2.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -50,6 +50,13 @@ API stands for “Application Programming Interface,” which basically means co
 2. Per-product settings
 
 == Changelog ==
+
+=======
+= 1.2.3 =
+* Fix issues caused by 1.2.2
+
+= 1.2.2 =
+* Prevent double URL-encoding
 
 = 1.2.1 =
 * URL-encode customer data before sending to API
