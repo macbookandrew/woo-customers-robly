@@ -353,7 +353,7 @@ function submit_woo_customers_to_robly( $order_id ) {
         'data11'        => $zip,
         'data5'         => $phone
     );
-    $user_parameters = http_build_query( $user_parameters );
+    $user_parameters = str_replace( '%40', '@', http_build_query( $user_parameters ) );
 
     // add sublist IDs
     $post_data = NULL;
