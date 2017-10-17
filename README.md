@@ -4,7 +4,7 @@
 **Tags:** woocommerce, robly, email, automation, customer  
 **Requires at least:** 3.0.1  
 **Tested up to:** 4.4  
-**Stable tag:** 1.2.4  
+**Stable tag:** 1.3.0  
 **License:** GPLv2 or later  
 **License URI:** http://www.gnu.org/licenses/gpl-2.0.html  
 
@@ -52,6 +52,9 @@ API stands for “Application Programming Interface,” which basically means co
 
 
 ## Changelog ##
+
+### 1.3.0 ###
+* Set the `include_autoresponder` parameter to “true” to enable autoresponders based on contacts being added to a new list (previously, if a contact was already in your account, the autoresponder would not be triggered)
 
 ### 1.2.4 ###
 * Fix some email encoding issues
