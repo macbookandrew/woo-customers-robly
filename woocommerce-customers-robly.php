@@ -343,15 +343,16 @@ function submit_woo_customers_to_robly( $order_id ) {
     // set up user data for the request
     $post_url = $API_method . $API_credentials;
     $user_parameters = array(
-        'email'         => $email,
-        'fname'         => $first_name,
-        'lname'         => $last_name,
-        'data8'         => $street_address_1,
-        'data9'         => $city,
-        'data10'        => $state,
-        'data22'        => $state,
-        'data11'        => $zip,
-        'data5'         => $phone
+        'email'                 => $email,
+        'fname'                 => $first_name,
+        'lname'                 => $last_name,
+        'data8'                 => $street_address_1,
+        'data9'                 => $city,
+        'data10'                => $state,
+        'data22'                => $state,
+        'data11'                => $zip,
+        'data5'                 => $phone,
+        'include_autoresponder' => 'true',
     );
     $user_parameters = str_replace( '%40', '@', http_build_query( $user_parameters ) );
 
