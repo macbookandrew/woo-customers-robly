@@ -355,6 +355,7 @@ function submit_woo_customers_to_robly( $order_id ) {
         'include_autoresponder' => 'true',
     );
     $user_parameters = str_replace( '%40', '@', http_build_query( $user_parameters ) );
+#TODO: remove hardcoded fields
 
     // add sublist IDs
     $post_data = NULL;
