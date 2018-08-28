@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: WooCommerce Customers to Robly
- * Version: 1.4.0
+ * Version: 1.4.1
  * Description: Adds WooCommerce customers to Robly using their API
  * Author: AndrewRMinion Design
  * Author URI: https://andrewrminion.com
@@ -48,8 +48,8 @@ add_action( 'admin_enqueue_scripts', 'wcc_admin_assets' );
  * @return void
  */
 function wcc_admin_assets() {
-	wp_enqueue_script( 'select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js', array(), null, true );
-	wp_enqueue_style( 'select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css', array(), null, false );
+	wp_enqueue_script( 'select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js', array(), null, true ); // phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion
+	wp_enqueue_style( 'select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css', array(), null, false ); // phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion
 
 	wp_add_inline_script( 'select2', 'jQuery(document).ready(function(){jQuery("select[name*=wcc_robly]").select2();});', 'after' );
 }
@@ -292,7 +292,7 @@ function wcc_robly_add_product_data_fields() {
 				<?php
 				foreach ( $all_sublists as $list ) {
 					echo '<option value="' . esc_attr( $list->sub_list->id ) . '"';
-					if ( $current_sublist_selections && in_array( $list->sub_list->id, $current_sublist_selections, true ) ) {
+					if ( $current_sublist_selections && in_array( $list->sub_list->id, $current_sublist_selections ) ) { // phpcs:ignore WordPress.PHP.StrictInArray.MissingTrueStrict
 						echo ' selected="selected"';
 					}
 					echo '>' . esc_html( $list->sub_list->name ) . '</option>';
