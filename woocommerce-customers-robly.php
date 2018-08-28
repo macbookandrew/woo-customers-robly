@@ -40,6 +40,19 @@ function wcc_get_robly_sublists() {
  */
 add_action( 'admin_menu', 'wcc_robly_add_admin_menu' );
 add_action( 'admin_init', 'wcc_robly_settings_init' );
+add_action( 'admin_enqueue_scripts', 'wcc_admin_assets' );
+
+/**
+ * Enqueue select2 and run on all WCC Robly.
+ *
+ * @return void
+ */
+function wcc_admin_assets() {
+	wp_enqueue_script( 'select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js', array(), null, true );
+	wp_enqueue_style( 'select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css', array(), null, false );
+
+	wp_add_inline_script( 'select2', 'jQuery(document).ready(function(){jQuery("select[name*=wcc_robly]").select2();});', 'after' );
+}
 
 /**
  * Add options page to menu.
