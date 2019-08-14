@@ -8,9 +8,11 @@ Stable tag: 1.4.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Adds WooCommerce customers to one or more Robly lists, optionally based on the product(s) they purchased.
+(Unsupported) Adds WooCommerce customers to one or more Robly lists, optionally based on the product(s) they purchased.
 
 == Description ==
+
+**Notice**: this plugin is unsupported. It hasn’t been updated for several major versions of WooCommerce, and includes a few custom fields that are hardcoded for specific Robly custom fields. Use at your own risk, but feel free to submit pull requests: https://github.com/macbookandrew/woo-customers-robly
 
 [Robly](https://www.robly.com/) is a paid email marketing service provider that allows customers to be in multiple lists for targeted marketing purposes. Using Robly’s API, this plugin adds WooCommerce customers to one or more Robly lists, optionally based on the product(s) they purchased.
 
